@@ -1,5 +1,5 @@
 {
-  "name": "@agentsys/glide",
+  "name": "@agentsys/glidemq",
   "version": "1.0.0",
   "description": "glide-mq message queue skills for agentsys - greenfield development and migration from BullMQ/Bee-Queue",
   "author": {
@@ -10,9 +10,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agent-sh/glide.git"
+    "url": "https://github.com/agent-sh/glidemq.git"
   },
-  "homepage": "https://github.com/agent-sh/glide",
+  "homepage": "https://github.com/agent-sh/glidemq",
   "keywords": [
     "agentsys",
     "glide-mq",

@@ -1,4 +1,4 @@
-# glide
+# glidemq
 
 > glide-mq message queue skills - greenfield development and migration from BullMQ/Bee-Queue
 
