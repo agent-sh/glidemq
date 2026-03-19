@@ -71,6 +71,7 @@ const job = queue.createJob(data)
 **glide-mq (options object):**
 ```typescript
 await queue.add('task-name', data, {
+  timeout: 30000,                                  // .timeout(ms) -> timeout (job option)
   attempts: 3,                                    // .retries(n) -> attempts
   backoff: { type: 'exponential', delay: 1000 },  // .backoff() -> backoff object
   delay: 60000,                                    // .delayUntil() -> delay (relative ms)
@@ -98,12 +99,12 @@ worker.on('completed', (job) => console.log('Done:', job.returnValue));
 | Job creation | `createJob(data).save()` | `queue.add(name, data, opts)` | Pattern changed |
 | Options style | Chained methods | Options object | Architectural |
 | Retries | `.retries(n)` | `attempts: n` | **Name changed!** |
-| Timeout | `.timeout(ms)` | `lockDuration` on Worker | Moved to worker |
+| Timeout | `.timeout(ms)` | `timeout` on job options | Per-job option |
 | Worker setup | `queue.process(n, fn)` | `new Worker(name, fn, { concurrency: n })` | Separate class |
-| Progress | `reportProgress(json)` | `updateProgress(0-100)` | Numeric only |
+| Progress | `reportProgress(json)` | `updateProgress(0-100 or object)` | Number or object |
 | Stall detection | Manual `stallInterval` | Auto via Worker `lockDuration` | Simplified |
 | `succeeded` event | `queue.on('succeeded')` | `worker.on('completed')` | Renamed |
-| Producer-only | `{ isWorker: false }` | `new Producer(connection)` | Dedicated class |
+| Producer-only | `{ isWorker: false }` | `new Producer('queue', { connection })` | Dedicated class |
 | Batch save | `queue.saveAll(jobs)` | `queue.addBulk(jobs)` | Renamed |
 | Connection | `{ redis: { host, port } }` | `{ addresses: [{ host, port }] }` | Must convert |
 | Delayed jobs | Not supported | `delay` option (ms) | New |

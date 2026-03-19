@@ -92,7 +92,8 @@ worker.on('failed', (job, err) => console.error(`Job ${job.id} failed:`, err.mes
 | `priority` | number | Lower number = higher priority (0 is highest) |
 | `ttl` | number | Auto-expire after time-to-live (ms) |
 | `jobId` | string | Custom deduplication ID |
-| `compression` | string | `'gzip'` for large payloads |
+
+**Note:** Compression (`compression: 'gzip'`) is a Queue-level option passed to the Queue constructor, not a per-job option.
 
 ## Worker Options
 

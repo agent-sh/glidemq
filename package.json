@@ -2,9 +2,29 @@
   "name": "@agentsys/glide",
   "version": "1.0.0",
   "description": "glide-mq message queue skills for agentsys - greenfield development and migration from BullMQ/Bee-Queue",
-  "license": "Apache-2.0",
+  "author": {
+    "name": "Avi Fenesh",
+    "email": "avifenesh@gmail.com",
+    "url": "https://github.com/avifenesh"
+  },
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agent-sh/glide"
+    "url": "https://github.com/agent-sh/glide.git"
+  },
+  "homepage": "https://github.com/agent-sh/glide",
+  "keywords": [
+    "agentsys",
+    "glide-mq",
+    "message-queue",
+    "valkey",
+    "redis",
+    "bullmq",
+    "bee-queue",
+    "migration",
+    "agent-skills"
+  ],
+  "scripts": {
+    "test": "echo 'Skills-only plugin - no runtime tests'"
   }
 }

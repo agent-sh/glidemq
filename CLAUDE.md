@@ -19,8 +19,31 @@
 7. **Report script failures before manual fallback** - Never silently bypass broken tooling.
 8. **Token efficiency** - Save tokens over decorations.
 
+## Model Selection
+
+| Model | When to Use |
+|-------|-------------|
+| **Opus** | Complex reasoning, analysis, planning |
+| **Sonnet** | Validation, pattern matching, most agents |
+| **Haiku** | Mechanical execution, no judgment needed |
+
+## Core Priorities
+
+1. User DX (plugin users first)
+2. Worry-free automation
+3. Token efficiency
+4. Quality output
+5. Simplicity
+
+## Dev Commands
+
+```bash
+npm test          # Run tests
+```
+
 ## References
 
-- Part of the [agent-sh](https://github.com/agent-sh) ecosystem
+- Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem
+- https://agentskills.io
 - glide-mq docs: https://avifenesh.github.io/glide-mq.dev/
 - glide-mq repo: https://github.com/avifenesh/glide-mq
