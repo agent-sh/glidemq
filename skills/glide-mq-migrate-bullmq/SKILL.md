@@ -73,6 +73,7 @@ The processor function signature is identical. Most code is a drop-in replacemen
 | `waitUntilFinished` | `job.waitUntilFinished(qe, ttl)` | `job.waitUntilFinished(pollMs, timeoutMs)` | Signature changed |
 | Per-key ordering | BullMQ Pro only | `opts.ordering.key` | Free in glide-mq |
 | Group concurrency | `group: { id, limit }` | `ordering: { key, concurrency }` | Renamed |
+| Runtime group rate limit | Not available | `job.rateLimitGroup(ms)` / `queue.rateLimitGroup(key, ms)` | New in glide-mq |
 | Dead letter queue | Not native | Built-in `deadLetterQueue` option | New |
 | Compression | Not available | `compression: 'gzip'` | New |
 | Worker `'active'` event | Emits `(job, prev)` | Emits `(job, jobId)` | Breaking |

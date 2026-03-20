@@ -92,6 +92,16 @@ worker.on('failed', (job, err) => console.error(`Job ${job.id} failed:`, err.mes
 | `priority` | number | Lower number = higher priority (0 is highest) |
 | `ttl` | number | Auto-expire after time-to-live (ms) |
 | `jobId` | string | Custom deduplication ID |
+| `ordering.key` | string | Per-key ordering group |
+| `ordering.concurrency` | number | Max parallel jobs per group (default 1) |
+| `ordering.rateLimit` | object | `{ max, duration }` - static sliding window per group |
+| `ordering.tokenBucket` | object | `{ capacity, refillRate }` - cost-based rate limiting per group |
+
+**Runtime group rate limiting** (new in v0.12):
+- `job.rateLimitGroup(duration, opts?)` - pause group from inside processor (e.g., on 429)
+- `throw new GroupRateLimitError(duration, opts?)` - throw-style sugar
+- `queue.rateLimitGroup(key, duration, opts?)` - pause group from outside (webhook, health check)
+- Options: `currentJob` ('requeue'|'fail'), `requeuePosition` ('front'|'back'), `extend` ('max'|'replace')
 
 **Note:** Compression (`compression: 'gzip'`) is a Queue-level option passed to the Queue constructor, not a per-job option.
 
