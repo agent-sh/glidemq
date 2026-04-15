@@ -36,18 +36,15 @@ jobs:
         if: steps.drift.outputs.status == '1'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRIFT_REPORT: ${{ steps.drift.outputs.report }}
         run: |
+          set -euo pipefail
           TITLE="Upstream glide-mq skills drift detected"
-          BODY=$(cat <<EOF
-          Automated drift detection found that vendored skills are behind \`avifenesh/glide-mq\` HEAD.
-
-          \`\`\`
-          ${{ steps.drift.outputs.report }}
-          \`\`\`
-
-          Run \`./scripts/sync-upstream.sh\` to update.
-          EOF
-          )
+          # Compose body via env var (not direct ${{ }} interpolation in the
+          # script body) to prevent any character in the upstream-sourced
+          # report (commit messages, version strings) from breaking out of
+          # the heredoc and executing arbitrary shell.
+          BODY=$(printf 'Automated drift detection found that vendored skills are behind `avifenesh/glide-mq` HEAD.\n\n```\n%s\n```\n\nRun `./scripts/sync-upstream.sh` to update.\n' "$DRIFT_REPORT")
           existing=$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[0].number' || echo "")
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$BODY"

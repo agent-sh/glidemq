@@ -36,6 +36,7 @@ for s in "${SKILLS[@]}"; do
   gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/SKILL.md?ref=$SHA" -q .content 2>/dev/null \
     | base64 -d > "skills/$s/SKILL.md"
 
+  # Newline-separated list, safe under spaces in filenames
   ref_files=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references?ref=$SHA" -q '.[] | select(.type=="file") | .name' 2>/dev/null || true)
   if [ -n "$ref_files" ]; then
     mkdir -p "skills/$s/references"
@@ -43,16 +44,17 @@ for s in "${SKILLS[@]}"; do
     for existing in "skills/$s/references"/*; do
       [ -f "$existing" ] || continue
       base=$(basename "$existing")
-      if ! grep -qx "$base" <<< "$ref_files"; then
+      if ! grep -qxF "$base" <<< "$ref_files"; then
         echo "  [REMOVE] references/$base (no longer upstream)"
         rm -f "$existing"
       fi
     done
-    for f in $ref_files; do
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
       gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references/$f?ref=$SHA" -q .content 2>/dev/null \
         | base64 -d > "skills/$s/references/$f"
       echo "  [OK] references/$f"
-    done
+    done <<< "$ref_files"
   fi
 done
 

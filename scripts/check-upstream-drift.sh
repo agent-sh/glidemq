@@ -19,8 +19,8 @@ if [ ! -f "$TRACKER" ]; then
   exit 2
 fi
 
-RECORDED_SHA=$(grep -oE '\| Upstream SHA \| `[a-f0-9]+`' "$TRACKER" | head -1 | grep -oE '[a-f0-9]{40}')
-RECORDED_VERSION=$(grep -oE '\| Upstream version \| `v[0-9.]+`' "$TRACKER" | head -1 | grep -oE 'v[0-9.]+')
+RECORDED_SHA=$(grep -oE '`[a-f0-9]{40}`' "$TRACKER" | head -1 | tr -d '`')
+RECORDED_VERSION=$(grep -oE '`v[0-9]+\.[0-9]+\.[0-9]+`' "$TRACKER" | head -1 | tr -d '`')
 
 UPSTREAM_SHA=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/commits/main" -q .sha 2>/dev/null)
 UPSTREAM_DATE=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/commits/main" -q .commit.author.date 2>/dev/null)
