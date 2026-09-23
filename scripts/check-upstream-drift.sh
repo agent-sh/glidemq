@@ -20,8 +20,9 @@ if [ ! -f "$TRACKER" ]; then
   exit 2
 fi
 
-RECORDED_SHA=$(grep -oE '`[a-f0-9]{40}`' "$TRACKER" | head -1 | tr -d '`')
-RECORDED_VERSION=$(grep -oE '`v[0-9]+\.[0-9]+\.[0-9]+`' "$TRACKER" | head -1 | tr -d '`')
+# grep finding nothing must not trip pipefail here; the empty check below reports it.
+RECORDED_SHA=$(grep -oE '`[a-f0-9]{40}`' "$TRACKER" | head -1 | tr -d '`' || true)
+RECORDED_VERSION=$(grep -oE '`v[0-9]+\.[0-9]+\.[0-9]+`' "$TRACKER" | head -1 | tr -d '`' || true)
 
 fail() {
   echo "[ERROR] $1" >&2
@@ -49,22 +50,32 @@ vendored_shas() {
 OLD=$(vendored_shas "$RECORDED_SHA" 2>/dev/null) || fail "could not list vendored files at $RECORDED_SHA"
 NEW=$(vendored_shas "$UPSTREAM_SHA" 2>/dev/null) || fail "could not list vendored files at $UPSTREAM_SHA"
 CHANGED=$(diff <(sort <<< "$OLD") <(sort <<< "$NEW") | sed -n 's/^[<>] \([^ ]*\) .*/\1/p' | sort -u || true)
-COMPARE_STATUS=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/compare/$RECORDED_SHA...$UPSTREAM_SHA" -q .status 2>/dev/null) || fail "could not compare $RECORDED_SHA with upstream main"
-BEHIND=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/compare/$RECORDED_SHA...$UPSTREAM_SHA" -q .ahead_by 2>/dev/null || echo "?")
+COMPARE=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/compare/$RECORDED_SHA...$UPSTREAM_SHA" -q '"\(.status) \(.ahead_by) \(.merge_base_commit.sha)"' 2>/dev/null) \
+  || fail "could not compare $RECORDED_SHA with upstream main"
+read -r COMPARE_STATUS BEHIND MERGE_BASE <<< "$COMPARE"
 
 if [ -z "$CHANGED" ]; then
-  echo "[OK] Upstream is $BEHIND commits ahead, none touching vendored skills or LICENSE ($RECORDED_VERSION, $RECORDED_SHA)"
+  echo "[OK] Vendored skills and LICENSE match upstream main ($RECORDED_VERSION, $RECORDED_SHA; main is $BEHIND commits ahead)"
+  if [ "$COMPARE_STATUS" != "ahead" ]; then
+    echo "  The recorded SHA is not on main (compare status: $COMPARE_STATUS). Re-sync to record a main commit: ./scripts/sync-upstream.sh"
+  fi
   exit 0
 fi
 
 # A recorded SHA that is not on main (for example the head of an unmerged
-# upstream PR) is expected to differ from main. Syncing to main would revert
-# it, so report it without calling it drift.
+# upstream PR) differs from main by design, and syncing to main would revert
+# it. That is only safe to call pending while main's vendored files are still
+# what they were where the pinned commit branched off. Once main changes them
+# (the PR merged, or anything else), it is drift.
 if [ "$COMPARE_STATUS" = "diverged" ] || [ "$COMPARE_STATUS" = "behind" ]; then
-  echo "[PENDING] Recorded SHA $RECORDED_SHA is not on upstream main (compare status: $COMPARE_STATUS)."
-  echo "  It is probably an unmerged upstream PR. Once it merges, sync to the merge commit:"
-  echo "  ./scripts/sync-upstream.sh <merge sha>"
-  exit 0
+  BASE=$(vendored_shas "$MERGE_BASE" 2>/dev/null) || fail "could not list vendored files at $MERGE_BASE"
+  if [ "$(sort <<< "$BASE")" = "$(sort <<< "$NEW")" ]; then
+    echo "[PENDING] Recorded SHA $RECORDED_SHA is not on upstream main (compare status: $COMPARE_STATUS),"
+    echo "  and main has not changed the vendored files since that commit branched off."
+    echo "  It is probably an unmerged upstream PR. Once it merges, sync to the merge commit:"
+    echo "  ./scripts/sync-upstream.sh <merge sha>"
+    exit 0
+  fi
 fi
 
 echo "[DRIFT] Vendored skills are behind upstream"

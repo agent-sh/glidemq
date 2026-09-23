@@ -51,7 +51,19 @@ for s in "${SKILLS[@]}"; do
   fetch "skills/$s/SKILL.md" "skills/$s/SKILL.md"
 
   # Newline-separated list, safe under spaces in filenames
-  ref_files=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references?ref=$SHA" -q '.[] | select(.type=="file") | .name' 2>/dev/null || true)
+  # A 404 means upstream has no references/ for this skill; any other failure
+  # stops the sync so an API error cannot delete local files.
+  ref_err=$(mktemp)
+  if ref_files=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references?ref=$SHA" -q '.[] | select(.type=="file") | .name' 2>"$ref_err"); then
+    :
+  elif grep -q "HTTP 404" "$ref_err"; then
+    ref_files=""
+  else
+    echo "[ERROR] Could not list skills/$s/references at $SHA: $(cat "$ref_err")" >&2
+    rm -f "$ref_err"
+    exit 1
+  fi
+  rm -f "$ref_err"
   if [ -n "$ref_files" ]; then
     mkdir -p "skills/$s/references"
     # Remove stale references not in upstream
