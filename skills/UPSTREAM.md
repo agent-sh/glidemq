@@ -21,11 +21,12 @@ The 3 SKILL.md files (and their `references/` directories) under this directory 
 
 | Field | Value |
 |-------|-------|
-| Upstream SHA | `ae9c0fa6d35921b939ed78bbcc287f7eb3982694` |
-| Upstream date | `2026-04-14T22:07:13Z` |
-| Upstream version | `v0.15.1` |
-| Synced on | `2026-04-15` |
+| Upstream SHA | `e4bfc8810501e8bc487ab17900c83cd56bc5310e` |
+| Upstream date | `2026-09-23T23:38:30Z` |
+| Upstream version | `v0.15.5` |
+| Synced on | `2026-09-23` |
 | Synced by | manual sync via `scripts/sync-upstream.sh` |
+| Note | Squash-merge commit of avifenesh/glide-mq#290 (skill rewrite). Vendored files are unchanged from the PR head `1b19a29`. |
 
 ## How to update
 
@@ -38,17 +39,13 @@ When upstream releases a new version of the skills:
 ./scripts/sync-upstream.sh <sha>           # sync to a specific commit
 ```
 
-The script:
-1. Fetches `skills/glide-mq*` and the LICENSE from the requested ref via the GitHub API
-2. Overwrites local copies (no merge - upstream is source of truth)
-3. Updates the **Last sync** table in this file with the new SHA, date, and version
-4. Prints a diff summary
+The script fetches `skills/glide-mq*` (SKILL.md and `references/`) and the LICENSE from the requested ref, replaces the local copies (upstream is the source of truth; reference files and directories that no longer exist upstream are removed), and updates the **Last sync** table. Each file is fetched to a temp file first, so a failed fetch stops the script without truncating the local copy.
 
 After running, review the diff, commit, and open a PR titled `sync: glide-mq skills to <ref>`.
 
 ## Drift detection
 
-CI runs `scripts/check-upstream-drift.sh` weekly (and on demand). It compares the recorded SHA in this file against `avifenesh/glide-mq` HEAD and opens an issue if they differ by more than 30 days or the upstream version bumped a major/minor.
+CI runs `scripts/check-upstream-drift.sh` weekly (Mondays, and on demand). It compares the git object SHAs of `skills/glide-mq*/` and `LICENSE` at the recorded SHA and at upstream `main`, so library-only commits upstream do not count as drift. When the vendored content differs, it exits 1 and the workflow opens (or comments on) an issue labeled `upstream-sync`, creating the label if needed. A recorded SHA that is not on upstream `main` (the head of an unmerged upstream PR) is reported as `[PENDING]` with exit 0, because syncing to `main` would revert it. API errors exit 2 and fail the workflow run.
 
 ## Why vendor instead of fetch at install time
 
