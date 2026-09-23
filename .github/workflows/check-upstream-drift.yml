@@ -30,6 +30,11 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          # 1 is drift (handled by the next step); anything else nonzero is a
+          # failed check and should show as a failed run.
+          if [ "$STATUS" -ne 0 ] && [ "$STATUS" -ne 1 ]; then
+            exit "$STATUS"
+          fi
           exit 0
 
       - name: Open or update drift issue

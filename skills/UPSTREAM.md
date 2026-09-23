@@ -45,7 +45,7 @@ After running, review the diff, commit, and open a PR titled `sync: glide-mq ski
 
 ## Drift detection
 
-CI runs `scripts/check-upstream-drift.sh` weekly (Mondays, and on demand). It compares the git object SHAs of `skills/glide-mq*/` and `LICENSE` at the recorded SHA and at upstream `main`, so library-only commits upstream do not count as drift. When the vendored content differs, it exits 1 and the workflow opens (or comments on) an issue labeled `upstream-sync`, creating the label if needed.
+CI runs `scripts/check-upstream-drift.sh` weekly (Mondays, and on demand). It compares the git object SHAs of `skills/glide-mq*/` and `LICENSE` at the recorded SHA and at upstream `main`, so library-only commits upstream do not count as drift. When the vendored content differs, it exits 1 and the workflow opens (or comments on) an issue labeled `upstream-sync`, creating the label if needed. A recorded SHA that is not on upstream `main` (the head of an unmerged upstream PR) is reported as `[PENDING]` with exit 0, because syncing to `main` would revert it. API errors exit 2 and fail the workflow run.
 
 ## Why vendor instead of fetch at install time
 
