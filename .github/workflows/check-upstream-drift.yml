@@ -40,14 +40,16 @@ jobs:
         run: |
           set -euo pipefail
           TITLE="Upstream glide-mq skills drift detected"
-          # Compose body via env var (not direct ${{ }} interpolation in the
-          # script body) to prevent any character in the upstream-sourced
-          # report (commit messages, version strings) from breaking out of
-          # the heredoc and executing arbitrary shell.
+          # The report reaches the script through an env var, not an inline
+          # expression, so nothing in the upstream-sourced text (commit
+          # messages, version strings) can break out and run as shell. Keep
+          # expression syntax out of these comments: Actions parses it even
+          # here, and an empty expression made this workflow invalid.
           BODY=$(printf 'Automated drift detection found that vendored skills are behind `avifenesh/glide-mq` HEAD.\n\n```\n%s\n```\n\nRun `./scripts/sync-upstream.sh` to update.\n' "$DRIFT_REPORT")
           existing=$(gh issue list --state open --search "$TITLE in:title" --json number -q '.[0].number' || echo "")
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$BODY"
           else
+            gh label create upstream-sync --color 0e8a16 --description "Vendored skills behind upstream" 2>/dev/null || true
             gh issue create --title "$TITLE" --body "$BODY" --label "upstream-sync"
           fi

@@ -31,10 +31,24 @@ fi
 echo "[INFO] Syncing to $SHA ($DATE, v$VERSION)"
 
 # Sync each skill SKILL.md and references/*
+# Fetch one upstream file into place. Writes to a temp file first so a failed
+# fetch leaves the local copy intact instead of truncating it.
+fetch() {
+  local src="$1" dest="$2" tmp
+  tmp="$(mktemp "${dest}.XXXXXX")"
+  if gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/$src?ref=$SHA" -q .content 2>/dev/null | base64 -d > "$tmp" && [ -s "$tmp" ]; then
+    mv "$tmp" "$dest"
+  else
+    rm -f "$tmp"
+    echo "[ERROR] Could not fetch $src at $SHA" >&2
+    exit 1
+  fi
+}
+
 for s in "${SKILLS[@]}"; do
   echo "[INFO] $s/SKILL.md"
-  gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/SKILL.md?ref=$SHA" -q .content 2>/dev/null \
-    | base64 -d > "skills/$s/SKILL.md"
+  mkdir -p "skills/$s"
+  fetch "skills/$s/SKILL.md" "skills/$s/SKILL.md"
 
   # Newline-separated list, safe under spaces in filenames
   ref_files=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references?ref=$SHA" -q '.[] | select(.type=="file") | .name' 2>/dev/null || true)
@@ -51,22 +65,23 @@ for s in "${SKILLS[@]}"; do
     done
     while IFS= read -r f; do
       [ -z "$f" ] && continue
-      gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills/$s/references/$f?ref=$SHA" -q .content 2>/dev/null \
-        | base64 -d > "skills/$s/references/$f"
+      fetch "skills/$s/references/$f" "skills/$s/references/$f"
       echo "  [OK] references/$f"
     done <<< "$ref_files"
+  elif [ -d "skills/$s/references" ]; then
+    echo "  [REMOVE] references/ (no longer upstream)"
+    rm -rf "skills/$s/references"
   fi
 done
 
 # Sync LICENSE
-gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/LICENSE?ref=$SHA" -q .content 2>/dev/null \
-  | base64 -d > LICENSE
+fetch "LICENSE" "LICENSE"
 
 # Update UPSTREAM.md tracker table
 TODAY=$(date -u +%Y-%m-%d)
 TRACKER="skills/UPSTREAM.md"
 if [ -f "$TRACKER" ]; then
-  python - <<PY
+  python3 - <<PY
 import re, sys
 path = "$TRACKER"
 with open(path, "r", encoding="utf-8") as f:

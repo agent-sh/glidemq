@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Check if vendored skills have drifted from upstream.
-# Reads recorded SHA from skills/UPSTREAM.md and compares to upstream main.
-# Exit code 0 = up to date, 1 = drift detected.
+# Reads the recorded SHA from skills/UPSTREAM.md and compares it to upstream main.
+# Only changes under skills/glide-mq*/ and LICENSE count as drift.
+# Exit code 0 = up to date, 1 = drift detected, 2 = error.
 
 set -euo pipefail
 
@@ -32,13 +33,29 @@ if [ "$RECORDED_SHA" = "$UPSTREAM_SHA" ]; then
   exit 0
 fi
 
-# Count commits behind
+# Upstream main moves for library changes too; only the vendored trees count.
+# Compare git object SHAs of skills/glide-mq*/ and LICENSE at both refs.
+vendored_shas() {
+  gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/skills?ref=$1" \
+    -q '.[] | select(.name | startswith("glide-mq")) | "skills/\(.name) \(.sha)"' || return 1
+  gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/contents/LICENSE?ref=$1" -q '"LICENSE \(.sha)"' || return 1
+}
+OLD=$(vendored_shas "$RECORDED_SHA" 2>/dev/null) || { echo "[ERROR] Could not list vendored files at $RECORDED_SHA" >&2; exit 2; }
+NEW=$(vendored_shas "$UPSTREAM_SHA" 2>/dev/null) || { echo "[ERROR] Could not list vendored files at $UPSTREAM_SHA" >&2; exit 2; }
+CHANGED=$(diff <(sort <<< "$OLD") <(sort <<< "$NEW") | sed -n 's/^[<>] \([^ ]*\) .*/\1/p' | sort -u || true)
 BEHIND=$(gh api "repos/$UPSTREAM_OWNER/$UPSTREAM_REPO/compare/$RECORDED_SHA...$UPSTREAM_SHA" -q .ahead_by 2>/dev/null || echo "?")
+
+if [ -z "$CHANGED" ]; then
+  echo "[OK] Upstream is $BEHIND commits ahead, none touching vendored skills or LICENSE ($RECORDED_VERSION, $RECORDED_SHA)"
+  exit 0
+fi
 
 echo "[DRIFT] Vendored skills are behind upstream"
 echo "  Recorded:  $RECORDED_VERSION ($RECORDED_SHA)"
 echo "  Upstream:  v$UPSTREAM_VERSION ($UPSTREAM_SHA)"
 echo "  Behind by: $BEHIND commits (as of $UPSTREAM_DATE)"
+echo "  Changed:"
+sed 's/^/    /' <<< "$CHANGED"
 echo ""
 echo "Run: ./scripts/sync-upstream.sh"
 exit 1
