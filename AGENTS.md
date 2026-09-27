@@ -47,3 +47,12 @@ npm test          # Run tests
 - https://agentskills.io
 - glide-mq docs: https://avifenesh.github.io/glide-mq.dev/
 - glide-mq repo: https://github.com/avifenesh/glide-mq
+
+## Validation scope
+
+Choose checks that cover the changed behavior. For CPU-only tooling, documentation
+and configuration changes, run the relevant CPU tests, static checks and configuration
+validation. Do not require a blanket GPU gate for those changes. Require GPU
+qualification when GPU, runtime or model behavior, or related claims, change.
+Preserve applicable native, model and hardware qualification gates. CPU checks do
+not qualify GPU behavior.
