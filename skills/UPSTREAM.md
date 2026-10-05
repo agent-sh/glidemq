@@ -21,12 +21,12 @@ The 3 SKILL.md files (and their `references/` directories) under this directory 
 
 | Field | Value |
 |-------|-------|
-| Upstream SHA | `e4bfc8810501e8bc487ab17900c83cd56bc5310e` |
-| Upstream date | `2026-09-23T23:38:30Z` |
-| Upstream version | `v0.15.5` |
-| Synced on | `2026-09-23` |
+| Upstream SHA | `bd37c9fdd11c717db42a3a9b66969d37b8567226` |
+| Upstream date | `2026-10-05T17:14:39Z` |
+| Upstream version | `v0.17.0` |
+| Synced on | `2026-10-05` |
 | Synced by | manual sync via `scripts/sync-upstream.sh` |
-| Note | Squash-merge commit of avifenesh/glide-mq#290 (skill rewrite). Vendored files are unchanged from the PR head `1b19a29`. |
+| Note | Core 0.17.0 plus the testing guidance correction in avifenesh/glide-mq#334. Vendored files and LICENSE exactly match the pinned commit. |
 
 ## How to update
 
