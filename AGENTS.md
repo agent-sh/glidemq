@@ -4,7 +4,7 @@ This repo is the glidemq plugin: glide-mq message queue skills for greenfield de
 
 ## Vendored skills
 
-The three skills (`glide-mq`, `glide-mq-migrate-bullmq`, `glide-mq-migrate-bee`), their `references/` and `LICENSE` are copied from [avifenesh/glide-mq](https://github.com/avifenesh/glide-mq) `skills/`, which is the source of truth. Change them upstream and re-sync with `./scripts/sync-upstream.sh [ref]`, because the next sync overwrites local edits. `skills/UPSTREAM.md` records the pinned commit and explains the sync and the weekly drift check (`scripts/check-upstream-drift.sh`). This repo owns `AGENTS.md`, `skills/UPSTREAM.md`, `scripts/`, `.github/` and the package metadata.
+The three skills (`glide-mq`, `glide-mq-migrate-bullmq`, `glide-mq-migrate-bee`) and their `references/` are copied from [avifenesh/glide-mq](https://github.com/avifenesh/glide-mq) `skills/`, and the root `LICENSE` from that repo's root `LICENSE`. Upstream is the source of truth. Change them upstream and re-sync with `./scripts/sync-upstream.sh [ref]`, because the next sync overwrites local edits. `skills/UPSTREAM.md` records the pinned commit and explains the sync and the weekly drift check (`scripts/check-upstream-drift.sh`). This repo owns `AGENTS.md`, `skills/UPSTREAM.md`, `scripts/`, `.github/` and the package metadata.
 
 ## Rules
 
