@@ -1,58 +1,30 @@
 # glidemq
 
-> glide-mq message queue skills - greenfield development and migration from BullMQ/Bee-Queue
+This repo is the glidemq plugin: glide-mq message queue skills for greenfield development and for migration from BullMQ or Bee-Queue. Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem; skills follow https://agentskills.io.
 
-## Skills
+## Vendored skills
 
-- glide-mq
-- glide-mq-migrate-bullmq
-- glide-mq-migrate-bee
+The three skills (`glide-mq`, `glide-mq-migrate-bullmq`, `glide-mq-migrate-bee`) and their `references/` are copied from [avifenesh/glide-mq](https://github.com/avifenesh/glide-mq) `skills/`, and the root `LICENSE` from that repo's root `LICENSE`. Upstream is the source of truth. Change them upstream and re-sync with `./scripts/sync-upstream.sh [ref]`, because the next sync overwrites local edits. `skills/UPSTREAM.md` records the pinned commit and explains the sync and the weekly drift check (`scripts/check-upstream-drift.sh`). This repo owns `AGENTS.md`, `skills/UPSTREAM.md`, `scripts/`, `.github/` and the package metadata.
 
-## Critical Rules
+## Rules
 
-1. **Plain text output** - No emojis, no ASCII art. Use `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]` for status markers.
-2. **No unnecessary files** - Don't create summary files, plan files, audit files, or temp docs.
-3. **Task is not done until tests pass** - Every feature/fix must have quality tests.
-4. **Create PRs for non-trivial changes** - No direct pushes to main.
-5. **Always run git hooks** - Never bypass pre-commit or pre-push hooks.
-6. **Use single dash for em-dashes** - In prose, use ` - ` (single dash with spaces), never ` -- `.
-7. **Report script failures before manual fallback** - Never silently bypass broken tooling.
-8. **Token efficiency** - Save tokens over decorations.
+- Output is plain text: no emojis or ASCII art. Status markers are `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]`.
+- Commit only product files. Summaries, plans and audit notes belong in the PR or the conversation.
+- A change is done when its checks pass; a script fix comes with a check that covers it.
+- Non-trivial changes go through a PR, not a direct push to main. Run the git hooks; do not bypass them.
+- In prose use ` - ` (single dash with spaces), not ` -- `.
+- If a script fails, report the failure before doing the step by hand, so broken tooling gets fixed.
+- Priorities, in order: plugin users' experience, automation that needs no babysitting, token efficiency, output quality, simplicity.
 
-## Model Selection
-
-| Model | When to Use |
-|-------|-------------|
-| **Opus** | Complex reasoning, analysis, planning |
-| **Sonnet** | Validation, pattern matching, most agents |
-| **Haiku** | Mechanical execution, no judgment needed |
-
-## Core Priorities
-
-1. User DX (plugin users first)
-2. Worry-free automation
-3. Token efficiency
-4. Quality output
-5. Simplicity
-
-## Dev Commands
+## Checks
 
 ```bash
-npm test          # Run tests
+npm test                          # syntax and executable checks for both scripts
+./scripts/check-upstream-drift.sh # 0 up to date or pending, 1 drift, 2 error
+agnix .                           # agent config lint
 ```
 
 ## References
 
-- Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem
-- https://agentskills.io
 - glide-mq docs: https://avifenesh.github.io/glide-mq.dev/
 - glide-mq repo: https://github.com/avifenesh/glide-mq
-
-## Validation scope
-
-Choose checks that cover the changed behavior. For CPU-only tooling, documentation
-and configuration changes, run the relevant CPU tests, static checks and configuration
-validation. Do not require a blanket GPU gate for those changes. Require GPU
-qualification when GPU, runtime or model behavior, or related claims, change.
-Preserve applicable native, model and hardware qualification gates. CPU checks do
-not qualify GPU behavior.

@@ -53,10 +53,8 @@ CI runs `scripts/check-upstream-drift.sh` weekly (Mondays, and on demand). It co
 - **Marketplace consistency**: the plugin's content is reviewable in this repo before users install it
 - **Determinism**: a given marketplace version pins to a specific upstream SHA
 
-## When NOT to edit these files locally
+## Editing these files
 
-Do **not** hand-edit the SKILL.md or any file in `references/`. Open a PR upstream at https://github.com/avifenesh/glide-mq instead, then re-sync here. Local edits will be lost on the next sync.
+Change a SKILL.md or a file in `references/` upstream: open a PR at https://github.com/avifenesh/glide-mq, then re-sync here. The next sync overwrites local edits.
 
-The only files in this directory that are owned by `agent-sh/glidemq` and safe to edit:
-- `skills/UPSTREAM.md` (this file)
-- New skill directories that don't exist upstream (none today)
+In this directory, `agent-sh/glidemq` owns only `skills/UPSTREAM.md` (this file) and any skill directory that does not exist upstream (none today).
