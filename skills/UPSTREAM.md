@@ -21,12 +21,12 @@ The 3 SKILL.md files (and their `references/` directories) under this directory 
 
 | Field | Value |
 |-------|-------|
-| Upstream SHA | `b0da65ee53e78cd0594f951b7d4d44c12867dc36` |
-| Upstream date | `2026-10-20T12:34:31Z` |
-| Upstream version | `v0.19.0` |
-| Synced on | `2026-10-22` |
+| Upstream SHA | `0f2799f8be1d1f3201f7337767c513fc4909c97e` |
+| Upstream date | `2026-10-24T13:01:08Z` |
+| Upstream version | `v0.20.0` |
+| Synced on | `2026-10-24` |
 | Synced by | manual sync via `scripts/sync-upstream.sh` |
-| Note | Pinned to the released v0.19.0 tag. Vendored files and LICENSE exactly match the pinned commit; the vendored trees also match upstream main at sync time. |
+| Note | Core 0.20.0 plus the accepted bounded-inventory skill guidance in avifenesh/glide-mq#348. All 17 vendored Markdown files and LICENSE exactly match the pinned commit. |
 
 ## How to update
 

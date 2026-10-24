@@ -25,6 +25,7 @@
     "agent-skills"
   ],
   "scripts": {
-    "test": "bash -n scripts/sync-upstream.sh && bash -n scripts/check-upstream-drift.sh && test -x scripts/sync-upstream.sh && test -x scripts/check-upstream-drift.sh"
+    "test": "bash -n scripts/sync-upstream.sh && bash -n scripts/check-upstream-drift.sh && test -x scripts/sync-upstream.sh && test -x scripts/check-upstream-drift.sh && npm run test:links",
+    "test:links": "node --test scripts/check-skill-links.test.mjs && node scripts/check-skill-links.cjs"
   }
 }
