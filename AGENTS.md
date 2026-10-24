@@ -19,7 +19,7 @@ The three skills (`glide-mq`, `glide-mq-migrate-bullmq`, `glide-mq-migrate-bee`)
 ## Checks
 
 ```bash
-npm test                          # syntax and executable checks for both scripts
+npm test                          # script syntax, link regression and standalone skill links
 ./scripts/check-upstream-drift.sh # 0 up to date or pending, 1 drift, 2 error
 agnix .                           # agent config lint
 ```
